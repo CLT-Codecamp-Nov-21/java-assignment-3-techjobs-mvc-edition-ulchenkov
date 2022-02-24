@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import static org.launchcode.techjobs.mvc.controllers.ListController.columnChoices;
 
@@ -31,10 +32,14 @@ public class SearchController {
     @PostMapping("results")
     public String displaySearchResults  (Model model, @RequestParam String searchType, @RequestParam String searchTerm) {
         ArrayList<Job> jobs;
-        if (searchType.equals("all") || searchTerm.isEmpty()){
+        if (searchTerm.toLowerCase().equals("all") || searchTerm.isEmpty()){
             jobs = JobData.findAll();
             model.addAttribute("title", "All Jobs");
-        } else {
+        } else if (searchType.equals("all")) {
+            jobs = JobData.findByValue(searchTerm);
+            model.addAttribute("title", "Jobs with: " + searchTerm);
+        }
+        else {
             jobs = JobData.findByColumnAndValue(searchType, searchTerm);
             model.addAttribute("title", "Jobs with " + columnChoices.get(searchType) + ": " + searchTerm);
         }
